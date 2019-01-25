@@ -2,8 +2,9 @@ import requests
 import sys,json
 import os
 import zipfile
-workshopdir = sys.argv[1] if len(sys.argv) >= 2 else sys.exit()
-links = sys.argv[2] if len(sys.argv) >= 2 else sys.exit()
+workshopdir = sys.argv[1] if len(sys.argv) >= 3 else sys.exit()
+links = sys.argv[2] if len(sys.argv) >= 3 else sys.exit()
+mode =  True if "install" == (sys.argv[3] if len(sys.argv) >= 3 else sys.exit()) else False
 #TMPDir = os.path.join(workshopdir,".tmp")
 #def CreateWTempFolder():
 #    if not os.path.isdir(TMPDir):
@@ -48,6 +49,18 @@ class PluginContent(object):
             return local_filename
         else:
             return None
+    def Download(self):
+        if(self.CreateFolder()):
+            local_filename = os.path.join(self.mfolder,self.filename)
+            r = requests.get(self.file_url, stream=True)
+            with open(local_filename, 'wb') as f:
+                for chunk in r.iter_content(chunk_size=1024): 
+                    if chunk: # filter out keep-alive new chunks
+                        f.write(chunk)
+                        #f.flush() commented by recommendation from J.F.Sebastian
+            return local_filename
+        else:
+            return None
 def GetPluginContent(id):
     m = {'itemcount' : 1, 'publishedfileids[0]' : id}
     r = requests.post("https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",m)
@@ -64,10 +77,15 @@ def main():
         pd = GetPID(plugin)
         if(pd):
             d = GetPluginContent(pd)
-            if(d.Install()):
-                print "%s install complete.     \r"%(d.fmid)
+            if(mode):
+                if(d.Install()):
+                    print "%s install complete.     \r"%(d.fmid)
+                else:
+                    print "%s aldready installed.       \r"%(d.fmid)
             else:
-                print "%s aldready installed       \r"%(d.fmid)
-    #print d,
+                if(d.Download()):
+                    print "%s Download complete.     \r"%(d.fmid)
+                else:
+                    print "%s aldready downloaded.       \r"%(d.fmid)
 if __name__ == '__main__':
     main()
