@@ -14,4 +14,4 @@ https://steamcommunity.com/sharedfiles/filedetails/?id=000000000
 https://steamcommunity.com/sharedfiles/filedetails/?id=000000000&searchtext=blablabla
 https://steamcommunity.com/sharedfiles/filedetails/?id=000000000
 ```
-Like this enter the link and the run installer
+Like this enter the link and the run installer/downloader
